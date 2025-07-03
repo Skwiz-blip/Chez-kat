@@ -208,12 +208,15 @@
       <tbody id="articlesList"></tbody>
     </table>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Initialisation Supabase
+    // Initialisation Supabase - CORRECTION ICI
     const supabaseUrl = 'https://yqsnrnhjoqeelpwmiosi.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlxc25ybmhqb3FlZWxwd21pb3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1NDc1NjksImV4cCI6MjA2NzEyMzU2OX0.jUJt2hsz3AxySRg4Fzlc4RH3SIYGCjNnnnfecnPVGhU';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    
+    // Utilisation correcte du CDN Supabase
+    const { createClient } = supabase;
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     function showAdminNotification(msg, type = 'success') {
       const notif = document.getElementById('adminNotification');
@@ -229,11 +232,11 @@
     }
 
     async function fetchArticles() {
-      let { data, error } = await supabase
+      let { data, error } = await supabaseClient
         .from('articles')
         .select('*');
       if (error) {
-        showAdminNotification("Erreur lors du chargement des articles : " + error.message, 'error');
+        showAdminNotification("Erreur lors du chargement des articles : " + error.message, 'error');
         return;
       }
       const tbody = document.getElementById('articlesList');
@@ -258,26 +261,69 @@
       const imageInput = document.getElementById('articleImage');
       let image_url = '';
 
-      if (imageInput.files.length > 0) {
-        const file = imageInput.files[0];
-        const { data, error } = await supabase.storage
-          .from('images')
-          .upload('articles/' + Date.now() + '-' + file.name, file);
-        if (error) {
-          showAdminNotification("Erreur lors de l'upload de l'image : " + error.message, 'error');
-          return;
-        }
-        image_url = supabase.storage.from('images').getPublicUrl(data.path).publicURL;
+      // Validation des champs
+      if (!nom || !prix || !stock) {
+        showAdminNotification("Veuillez remplir tous les champs obligatoires", 'error');
+        return;
       }
 
-      const { error } = await supabase
+      if (imageInput.files.length > 0) {
+        const file = imageInput.files[0];
+        console.log('Fichier sélectionné:', file.name, file.type, file.size);
+        
+        // Vérifier le type de fichier
+        if (!file.type.startsWith('image/')) {
+          showAdminNotification("Veuillez sélectionner un fichier image valide", 'error');
+          return;
+        }
+
+        // Générer un nom de fichier unique et simple
+        const fileExtension = file.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExtension}`;
+        
+        console.log('Upload vers:', fileName);
+        
+        const { data, error } = await supabaseClient.storage
+          .from('images')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+          
+        if (error) {
+          console.error('Erreur upload:', error);
+          showAdminNotification("Erreur lors de l'upload de l'image : " + error.message, 'error');
+          return;
+        }
+        
+        console.log('Upload réussi:', data);
+        
+        // Récupérer l'URL publique
+        const { data: publicData } = supabaseClient.storage
+          .from('images')
+          .getPublicUrl(data.path);
+        image_url = publicData.publicUrl;
+        
+        console.log('URL publique:', image_url);
+      }
+
+      const { error } = await supabaseClient
         .from('articles')
         .insert([{ nom, description, prix, stock, image_url }]);
       if (error) {
-        showAdminNotification("Erreur lors de l'ajout de l'article : " + error.message, 'error');
+        console.error('Erreur insertion:', error);
+        showAdminNotification("Erreur lors de l'ajout de l'article : " + error.message, 'error');
         return;
       }
       showAdminNotification('Article ajouté avec succès !', 'success');
+      
+      // Réinitialiser le formulaire
+      document.getElementById('articleName').value = '';
+      document.getElementById('articleDescription').value = '';
+      document.getElementById('articlePrice').value = '';
+      document.getElementById('articleStock').value = '';
+      document.getElementById('articleImage').value = '';
+      
       toggleAddArticleForm();
       fetchArticles();
     }
@@ -286,4 +332,4 @@
     window.addEventListener('DOMContentLoaded', fetchArticles);
   </script>
 </body>
-</html> 
+</html>
