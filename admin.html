@@ -276,15 +276,15 @@
           return;
         }
 
-        // Générer un nom de fichier unique SANS sous-dossier - DEBUG
+        // Générer un nom de fichier unique AVEC le sous-dossier articles/
         const fileExtension = file.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExtension}`;
+        const fileName = `articles/${Date.now()}.${fileExtension}`;
         
         console.log('DEBUG - Nom du fichier généré:', fileName);
         console.log('DEBUG - Bucket cible: images');
         console.log('DEBUG - Chemin complet:', `images/${fileName}`);
         
-        // Upload directement dans le bucket 'images' sans sous-dossier
+        // Upload dans le bucket 'images' avec le sous-dossier articles/
         const { data, error } = await supabaseClient.storage
           .from('images')
           .upload(fileName, file, {
