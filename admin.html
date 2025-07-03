@@ -51,10 +51,23 @@
     </table>
   </div>
   <script>
-    // Remplacez par vos identifiants Supabase
+    // Initialisation Supabase AVANT toute fonction
     const supabaseUrl = 'https://yqsnrnhjoqeelpwmiosi.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlxc25ybmhqb3FlZWxwd21pb3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1NDc1NjksImV4cCI6MjA2NzEyMzU2OX0.jUJt2hsz3AxySRg4Fzlc4RH3SIYGCjNnnnfecnPVGhU';
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Test de connexion à Supabase
+    async function testConnexionSupabase() {
+      let { data, error } = await supabase.from('articles').select('*');
+      if (error) {
+        alert("Erreur de connexion à Supabase : " + error.message);
+        console.log(error);
+      } else {
+        alert("Connexion à Supabase OK ! Nombre d'articles : " + data.length);
+        console.log(data);
+      }
+    }
+    window.addEventListener('DOMContentLoaded', testConnexionSupabase);
 
     function toggleAddArticleForm() {
       const form = document.getElementById('addArticleForm');
