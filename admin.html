@@ -276,11 +276,13 @@
           return;
         }
 
-        // Générer un nom de fichier unique SANS sous-dossier
+        // Générer un nom de fichier unique SANS sous-dossier - DEBUG
         const fileExtension = file.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExtension}`;
         
-        console.log('Upload vers:', fileName);
+        console.log('DEBUG - Nom du fichier généré:', fileName);
+        console.log('DEBUG - Bucket cible: images');
+        console.log('DEBUG - Chemin complet:', `images/${fileName}`);
         
         // Upload directement dans le bucket 'images' sans sous-dossier
         const { data, error } = await supabaseClient.storage
@@ -291,7 +293,7 @@
           });
           
         if (error) {
-          console.error('Erreur upload:', error);
+          console.error('Erreur upload complète:', error);
           showAdminNotification("Erreur lors de l'upload de l'image : " + error.message, 'error');
           return;
         }
@@ -304,9 +306,10 @@
           .getPublicUrl(data.path);
         image_url = publicData.publicUrl;
         
-        console.log('URL publique:', image_url);
+        console.log('URL publique générée:', image_url);
       }
 
+      // Insertion dans la base de données
       const { error } = await supabaseClient
         .from('articles')
         .insert([{ nom, description, prix, stock, image_url }]);
