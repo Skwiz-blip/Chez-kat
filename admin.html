@@ -5,25 +5,183 @@
   <title>Admin - Chez Kataléa</title>
   <style>
     body { font-family: 'Montserrat', Arial, sans-serif; background: #fff5f7; color: #4a0a2a; margin: 0; padding: 0; }
-    h1 { text-align: center; margin-top: 40px; color: #e83e8c; }
-    .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(232,62,140,0.08); padding: 32px; }
-    button { background: linear-gradient(45deg, #e83e8c, #f48fb1); color: white; border: none; border-radius: 30px; padding: 10px 28px; font-weight: 600; font-size: 1rem; cursor: pointer; margin: 8px 0; transition: background 0.3s; }
-    button:hover { background: #880e4f; }
-    #addArticleForm { background: #f8bbd0; padding: 24px; border-radius: 12px; margin-bottom: 32px; }
-    #addArticleForm input, #addArticleForm textarea { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; }
-    #addArticleForm label { font-weight: 500; color: #880e4f; }
-    table { width: 100%; border-collapse: collapse; margin-top: 24px; background: white; }
-    th, td { padding: 12px 10px; border-bottom: 1px solid #f8bbd0; text-align: left; }
-    th { background: #fff5f7; color: #e83e8c; }
-    tr:hover { background: #f8bbd0; }
-    img { border-radius: 8px; }
+    .admin-header {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(232,62,140,0.08);
+      z-index: 100;
+      padding: 0 0 0 0;
+    }
+    .admin-header-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 32px;
+    }
+    .admin-logo {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: #e83e8c;
+      font-weight: bold;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .admin-logout {
+      background: #f8bbd0;
+      color: #880e4f;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 22px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .admin-logout:hover {
+      background: #e83e8c;
+      color: #fff;
+    }
+    .container {
+      max-width: 900px;
+      margin: 100px auto 40px auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(232,62,140,0.08);
+      padding: 32px;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 0;
+      color: #e83e8c;
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.2rem;
+      letter-spacing: 1px;
+    }
+    .admin-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 18px;
+    }
+    .admin-btn {
+      background: linear-gradient(45deg, #e83e8c, #f48fb1);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 10px 28px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 8px 0;
+      transition: background 0.3s;
+      box-shadow: 0 2px 8px rgba(232,62,140,0.08);
+    }
+    .admin-btn:hover {
+      background: #880e4f;
+    }
+    #addArticleForm {
+      background: #f8bbd0;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 10px rgba(232,62,140,0.08);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #addArticleForm label {
+      font-weight: 500;
+      color: #880e4f;
+      margin-top: 10px;
+      display: block;
+    }
+    #addArticleForm input, #addArticleForm textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      background: #fff;
+      box-sizing: border-box;
+    }
+    #addArticleForm button {
+      margin-top: 8px;
+      margin-right: 8px;
+    }
+    .notification {
+      display: none;
+      position: fixed;
+      top: 80px;
+      right: 30px;
+      background: #4CAF50;
+      color: white;
+      padding: 16px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(76,175,80,0.15);
+      z-index: 2000;
+      animation: fadeIn 0.3s;
+    }
+    .notification-error {
+      background: #dc3545;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      background: white;
+      font-size: 1rem;
+    }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #f8bbd0;
+      text-align: left;
+    }
+    th {
+      background: #fff5f7;
+      color: #e83e8c;
+      font-weight: 700;
+    }
+    tr:hover {
+      background: #f8bbd0;
+    }
+    img {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(232,62,140,0.08);
+    }
+    @media (max-width: 700px) {
+      .container, .admin-header-content { padding: 10px; }
+      #addArticleForm { padding: 10px; }
+      table, thead, tbody, th, td, tr { display: block; }
+      th, td { padding: 8px 4px; }
+      tr { margin-bottom: 12px; }
+      th { background: none; color: #e83e8c; }
+    }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <div class="admin-header">
+    <div class="admin-header-content">
+      <div class="admin-logo"><span>Chez Kataléa</span> <span style="font-size:1.2rem;">Admin</span></div>
+      <!-- <button class="admin-logout">Déconnexion</button> -->
+    </div>
+  </div>
+  <div class="notification" id="adminNotification"></div>
   <div class="container">
-    <h1>Tableau de bord</h1>
-    <button onclick="toggleAddArticleForm()">Ajouter un article</button>
+    <h1>Tableau de bord Administrateur</h1>
+    <div class="admin-actions">
+      <button class="admin-btn" onclick="toggleAddArticleForm()">Ajouter un article</button>
+    </div>
     <div id="addArticleForm" style="display:none;">
       <label>Nom du produit</label>
       <input type="text" id="articleName" placeholder="Nom du produit">
@@ -35,8 +193,8 @@
       <input type="number" id="articleStock" placeholder="Stock">
       <label>Image</label>
       <input type="file" id="articleImage" accept="image/*">
-      <button onclick="addNewArticle()">Enregistrer</button>
-      <button type="button" onclick="toggleAddArticleForm()" style="background:#6c757d;">Annuler</button>
+      <button class="admin-btn" onclick="addNewArticle()">Enregistrer</button>
+      <button type="button" class="admin-btn" style="background:#6c757d;" onclick="toggleAddArticleForm()">Annuler</button>
     </div>
     <table>
       <thead>
@@ -50,24 +208,20 @@
       <tbody id="articlesList"></tbody>
     </table>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script>
-    // Initialisation Supabase AVANT toute fonction
+    // Initialisation Supabase
     const supabaseUrl = 'https://yqsnrnhjoqeelpwmiosi.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlxc25ybmhqb3FlZWxwd21pb3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1NDc1NjksImV4cCI6MjA2NzEyMzU2OX0.jUJt2hsz3AxySRg4Fzlc4RH3SIYGCjNnnnfecnPVGhU';
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    // Test de connexion à Supabase
-    async function testConnexionSupabase() {
-      let { data, error } = await supabase.from('articles').select('*');
-      if (error) {
-        alert("Erreur de connexion à Supabase : " + error.message);
-        console.log(error);
-      } else {
-        alert("Connexion à Supabase OK ! Nombre d'articles : " + data.length);
-        console.log(data);
-      }
+    function showAdminNotification(msg, type = 'success') {
+      const notif = document.getElementById('adminNotification');
+      notif.innerText = msg;
+      notif.className = 'notification' + (type === 'error' ? ' notification-error' : '');
+      notif.style.display = 'block';
+      setTimeout(() => { notif.style.display = 'none'; }, 3000);
     }
-    window.addEventListener('DOMContentLoaded', testConnexionSupabase);
 
     function toggleAddArticleForm() {
       const form = document.getElementById('addArticleForm');
@@ -79,7 +233,7 @@
         .from('articles')
         .select('*');
       if (error) {
-        alert("Erreur lors du chargement des articles : " + error.message);
+        showAdminNotification("Erreur lors du chargement des articles : " + error.message, 'error');
         return;
       }
       const tbody = document.getElementById('articlesList');
@@ -110,7 +264,7 @@
           .from('images')
           .upload('articles/' + Date.now() + '-' + file.name, file);
         if (error) {
-          alert("Erreur lors de l'upload de l'image : " + error.message);
+          showAdminNotification("Erreur lors de l'upload de l'image : " + error.message, 'error');
           return;
         }
         image_url = supabase.storage.from('images').getPublicUrl(data.path).publicURL;
@@ -120,13 +274,15 @@
         .from('articles')
         .insert([{ nom, description, prix, stock, image_url }]);
       if (error) {
-        alert("Erreur lors de l'ajout de l'article : " + error.message);
+        showAdminNotification("Erreur lors de l'ajout de l'article : " + error.message, 'error');
         return;
       }
+      showAdminNotification('Article ajouté avec succès !', 'success');
       toggleAddArticleForm();
       fetchArticles();
     }
 
+    // Appels au chargement de la page
     window.addEventListener('DOMContentLoaded', fetchArticles);
   </script>
 </body>
