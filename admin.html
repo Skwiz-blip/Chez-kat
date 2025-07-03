@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Chez Kataléa</title>
+  <style>
+    body { font-family: 'Montserrat', Arial, sans-serif; background: #fff5f7; color: #4a0a2a; margin: 0; padding: 0; }
+    h1 { text-align: center; margin-top: 40px; color: #e83e8c; }
+    .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(232,62,140,0.08); padding: 32px; }
+    button { background: linear-gradient(45deg, #e83e8c, #f48fb1); color: white; border: none; border-radius: 30px; padding: 10px 28px; font-weight: 600; font-size: 1rem; cursor: pointer; margin: 8px 0; transition: background 0.3s; }
+    button:hover { background: #880e4f; }
+    #addArticleForm { background: #f8bbd0; padding: 24px; border-radius: 12px; margin-bottom: 32px; }
+    #addArticleForm input, #addArticleForm textarea { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; }
+    #addArticleForm label { font-weight: 500; color: #880e4f; }
+    table { width: 100%; border-collapse: collapse; margin-top: 24px; background: white; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid #f8bbd0; text-align: left; }
+    th { background: #fff5f7; color: #e83e8c; }
+    tr:hover { background: #f8bbd0; }
+    img { border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <div class="container">
+    <h1>Tableau de bord Admin</h1>
+    <button onclick="toggleAddArticleForm()">Ajouter un article</button>
+    <div id="addArticleForm" style="display:none;">
+      <label>Nom du produit</label>
+      <input type="text" id="articleName" placeholder="Nom du produit">
+      <label>Description</label>
+      <textarea id="articleDescription" placeholder="Description"></textarea>
+      <label>Prix (FCFA)</label>
+      <input type="number" id="articlePrice" placeholder="Prix (FCFA)">
+      <label>Stock</label>
+      <input type="number" id="articleStock" placeholder="Stock">
+      <label>Image</label>
+      <input type="file" id="articleImage" accept="image/*">
+      <button onclick="addNewArticle()">Enregistrer</button>
+      <button type="button" onclick="toggleAddArticleForm()" style="background:#6c757d;">Annuler</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Nom</th>
+          <th>Prix</th>
+          <th>Stock</th>
+        </tr>
+      </thead>
+      <tbody id="articlesList"></tbody>
+    </table>
+  </div>
+  <script>
+    // Remplacez par vos identifiants Supabase
+    const supabaseUrl = 'https://yqsnrnhjoqeelpwmiosi.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlxc25ybmhqb3FlZWxwd21pb3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1NDc1NjksImV4cCI6MjA2NzEyMzU2OX0.jUJt2hsz3AxySRg4Fzlc4RH3SIYGCjNnnnfecnPVGhU';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    function toggleAddArticleForm() {
+      const form = document.getElementById('addArticleForm');
+      form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+    }
+
+    async function fetchArticles() {
+      let { data, error } = await supabase
+        .from('articles')
+        .select('*');
+      if (error) {
+        alert("Erreur lors du chargement des articles : " + error.message);
+        return;
+      }
+      const tbody = document.getElementById('articlesList');
+      tbody.innerHTML = '';
+      data.forEach(article => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><img src="${article.image_url || ''}" alt="Image" style="width:60px;height:60px;object-fit:cover;"></td>
+          <td>${article.nom}</td>
+          <td>${article.prix} FCFA</td>
+          <td>${article.stock}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function addNewArticle() {
+      const nom = document.getElementById('articleName').value;
+      const description = document.getElementById('articleDescription').value;
+      const prix = parseInt(document.getElementById('articlePrice').value, 10);
+      const stock = parseInt(document.getElementById('articleStock').value, 10);
+      const imageInput = document.getElementById('articleImage');
+      let image_url = '';
+
+      if (imageInput.files.length > 0) {
+        const file = imageInput.files[0];
+        const { data, error } = await supabase.storage
+          .from('images')
+          .upload('articles/' + Date.now() + '-' + file.name, file);
+        if (error) {
+          alert("Erreur lors de l'upload de l'image : " + error.message);
+          return;
+        }
+        image_url = supabase.storage.from('images').getPublicUrl(data.path).publicURL;
+      }
+
+      const { error } = await supabase
+        .from('articles')
+        .insert([{ nom, description, prix, stock, image_url }]);
+      if (error) {
+        alert("Erreur lors de l'ajout de l'article : " + error.message);
+        return;
+      }
+      toggleAddArticleForm();
+      fetchArticles();
+    }
+
+    window.addEventListener('DOMContentLoaded', fetchArticles);
+  </script>
+</body>
+</html> 
