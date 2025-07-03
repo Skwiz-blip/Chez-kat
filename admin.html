@@ -210,11 +210,10 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Initialisation Supabase - CORRECTION ICI
+    // Initialisation Supabase
     const supabaseUrl = 'https://yqsnrnhjoqeelpwmiosi.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlxc25ybmhqb3FlZWxwd21pb3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1NDc1NjksImV4cCI6MjA2NzEyMzU2OX0.jUJt2hsz3AxySRg4Fzlc4RH3SIYGCjNnnnfecnPVGhU';
     
-    // Utilisation correcte du CDN Supabase
     const { createClient } = supabase;
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
@@ -277,12 +276,13 @@
           return;
         }
 
-        // Générer un nom de fichier unique et simple
+        // Générer un nom de fichier unique SANS sous-dossier
         const fileExtension = file.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExtension}`;
         
         console.log('Upload vers:', fileName);
         
+        // Upload directement dans le bucket 'images' sans sous-dossier
         const { data, error } = await supabaseClient.storage
           .from('images')
           .upload(fileName, file, {
